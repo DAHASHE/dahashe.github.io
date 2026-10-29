@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Octa</title>
+<meta name="description" content="Octa: files, code, AI assistant, drawing and Wi-Fi sharing in one app.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060b16; --panel:#0f1828; --panel2:#142036; --line:#1d2c47;
+  --text:#e8edf6; --mute:#8a98b3;
+  --gold:#f2c14e; --teal:#2dd4a0; --orange:#f08030; --cyan:#26b9e0; --bronze:#c99a6b;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.8;
+  background-image:radial-gradient(#1a2840 1px,transparent 1px);background-size:26px 26px;
+}
+html[lang=ar] .en,html[lang=en] .ar{display:none}
+.mono{font-family:"JetBrains Mono",monospace;direction:ltr;unicode-bidi:isolate}
+a{color:inherit}
+.wrap{max-width:1080px;margin:auto;padding:0 20px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* header + language switch (same segmented pill as the app's Wi-Fi toggle) */
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{font-weight:700;font-size:1.4rem;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+.logo i{width:26px;height:26px;border-radius:50%;border:3px solid var(--gold);display:block;position:relative}
+.logo i::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--gold)}
+.lang{position:relative;display:flex;direction:ltr;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px}
+.lang button{all:unset;cursor:pointer;position:relative;z-index:1;width:48px;text-align:center;padding:3px 0;font:600 .85rem "JetBrains Mono",monospace;color:var(--mute);transition:color .25s}
+.lang .pill{position:absolute;top:4px;bottom:4px;left:4px;width:48px;border-radius:10px;background:#12435a;border:1px solid var(--cyan);transition:transform .3s}
+html[lang=en] .lang .pill{transform:translateX(48px)}
+html[lang=ar] .lang button[data-l=ar],html[lang=en] .lang button[data-l=en]{color:#fff}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:40px 0 70px}
+h1{font-size:clamp(2.2rem,5.5vw,3.6rem);line-height:1.25;font-weight:700}
+.sub{color:var(--mute);font-size:1.1rem;margin:18px 0 28px;max-width:34em}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:12px 26px;border-radius:14px;font-weight:600;text-decoration:none}
+.btn.main{background:var(--teal);color:#04281d}
+.btn.alt{border:1px solid var(--line);background:var(--panel)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}
+.chip{font-size:.85rem;padding:3px 14px;border-radius:99px;border:1px solid var(--line);background:var(--panel)}
+.chip:nth-child(1){color:var(--teal)}.chip:nth-child(2){color:var(--cyan)}.chip:nth-child(3){color:#ef7bb0}.chip:nth-child(4){color:var(--gold)}.chip:nth-child(5){color:var(--orange)}
+
+/* phone with the real app's bottom bar + central button */
+.phone{width:min(320px,100%);margin:auto;height:560px;border-radius:38px;border:2px solid var(--line);background:linear-gradient(#0a1222,#050913);position:relative;overflow:hidden;box-shadow:0 30px 80px #000a}
+.phone .top{display:flex;gap:10px;justify-content:flex-end;padding:20px 22px;color:var(--gold);direction:ltr}
+.phone .top b{width:26px;height:26px;border-radius:8px;border:2px solid currentColor;display:block;opacity:.8}
+.file{margin:0 16px 10px;padding:12px 14px;border-radius:14px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;gap:12px;direction:ltr}
+.file i{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font:700 .7rem "JetBrains Mono",monospace;font-style:normal}
+.file small{display:block;color:var(--mute);font:.72rem "JetBrains Mono",monospace}
+.f-h i{background:#3a1d17;color:#ff7a59}.f-j i{background:#33300f;color:var(--gold)}.f-c i{background:#12264a;color:#6ea0ff}
+.nav{position:absolute;left:14px;right:14px;bottom:16px;height:66px;border-radius:22px;background:var(--panel);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:0 22px;font-size:.68rem;color:var(--mute);direction:ltr}
+.nav span{width:52px;text-align:center}.nav .on{color:var(--gold);font-weight:700}
+.fab{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:68px;height:68px;border-radius:50%;border:0;cursor:pointer;background:radial-gradient(circle at 35% 30%,#e3b88a,var(--bronze) 60%,#8c6540);display:grid;place-items:center;z-index:3;box-shadow:0 8px 24px #0008;transition:transform .3s}
+.fab::before{content:"";width:26px;height:26px;border-radius:50%;border:4px solid #1a1208}
+.phone.open .fab{transform:translateX(-50%) rotate(90deg)}
+.menu{position:absolute;left:0;right:0;bottom:116px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:2;pointer-events:none}
+.menu div{padding:9px 20px;border-radius:99px;background:var(--panel2);border:1px solid #1f6a6e;font-size:.85rem;opacity:0;transform:translateY(24px) scale(.9);transition:all .3s}
+.phone.open .menu{pointer-events:auto}
+.phone.open .menu div{opacity:1;transform:none}
+.phone.open .menu div:nth-child(4){transition-delay:.04s}.phone.open .menu div:nth-child(3){transition-delay:.08s}.phone.open .menu div:nth-child(2){transition-delay:.12s}.phone.open .menu div:nth-child(1){transition-delay:.16s}
+.hint{text-align:center;color:var(--gold);font-size:.85rem;margin-top:14px}
+
+/* sections */
+section{padding:56px 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(1.6rem,3.5vw,2.2rem);margin-bottom:10px}
+.lead{color:var(--mute);max-width:40em;margin-bottom:32px}
+.rows{display:grid;gap:14px}
+.row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:18px 22px;border-radius:16px;background:var(--panel);border-inline-start:4px solid var(--c)}
+.row h3{color:var(--c);font-size:1.1rem}
+.row p{color:#b9c4d9}
+.bar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:26px}
+.bar div{padding:16px 10px;border-radius:16px;background:var(--panel);border:1px solid var(--line);text-align:center}
+.bar div:nth-child(3){border-radius:50%;aspect-ratio:1;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#e3b88a,var(--bronze) 60%,#8c6540);color:#1a1208;font-weight:700;padding:6px;font-size:.85rem}
+.bar small{display:block;color:var(--mute);font-size:.78rem;line-height:1.5;margin-top:4px}
+.bar div:nth-child(3) small{color:#3a2a18}
+.share{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center}
+.qr{width:170px;height:170px;border-radius:18px;background:#eef2f8;padding:14px;display:grid;grid-template-columns:repeat(11,1fr);gap:2px}
+.qr i{background:#0a0f1a;border-radius:1px}.qr i.w{background:transparent}
+.link{display:inline-block;margin:12px 0;padding:10px 16px;border-radius:12px;background:var(--panel);border:1px solid var(--line);color:var(--cyan);font-size:.9rem}
+.steps{padding-inline-start:20px;color:#b9c4d9}
+footer{border-top:1px solid var(--line);padding:34px 0 50px;color:var(--mute);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer nav{display:flex;gap:22px}
+footer a{text-decoration:none}footer a:hover{color:var(--gold)}
+
+@media(max-width:760px){
+  .hero,.share{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr;gap:4px}
+  .bar{grid-template-columns:repeat(2,1fr)}
+  .bar div:nth-child(3){aspect-ratio:auto;border-radius:16px}
+  .share{justify-items:center;text-align:start}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo"><i></i>Octa</div>
+  <div class="lang" role="group" aria-label="Language">
+    <span class="pill"></span>
+    <button data-l="ar">AR</button><button data-l="en">EN</button>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div>
+    <h1><span class="ar">كل ما تحتاجه على هاتفك، تحت زر واحد</span><span class="en">Everything your phone needs, under one button</span></h1>
+    <p class="sub"><span class="ar">Octa تطبيق يجمع مدير الملفات، محرر الأكواد، مساعد ذكاء اصطناعي، لوحة رسم، ومشاركة الملفات عبر Wi-Fi. وكل شيء يعمل من شريط سفلي بسيط.</span><span class="en">Octa combines a file manager, a code editor, an AI assistant, a drawing canvas and Wi-Fi file sharing. All of it runs from one simple bottom bar.</span></p>
+    <div class="btns">
+      <a class="btn main" href="https://play.google.com/store/apps/details?id=com.octa.octa" id="play"><span class="ar">حمّله من Google Play</span><span class="en">Get it on Google Play</span></a>
+      <a class="btn alt" href="#features"><span class="ar">اكتشف المزايا</span><span class="en">See features</span></a>
+    </div>
+    <div class="chips">
+      <span class="chip"><span class="ar">الملفات</span><span class="en">Files</span></span>
+      <span class="chip"><span class="ar">الأكواد</span><span class="en">Code</span></span>
+      <span class="chip"><span class="ar">الرسم</span><span class="en">Drawing</span></span>
+      <span class="chip"><span class="ar">المساعد</span><span class="en">Assistant</span></span>
+      <span class="chip"><span class="ar">المشاركة</span><span class="en">Sharing</span></span>
+    </div>
+  </div>
+  <div>
+    <div class="phone" id="phone">
+      <div class="top"><b></b><b></b><b></b></div>
+      <div class="file f-h"><i>HTML</i><div>index.html<small>727 B</small></div></div>
+      <div class="file f-j"><i>JS</i><div>script.js<small>968 B</small></div></div>
+      <div class="file f-c"><i>CSS</i><div>style.css<small>1.9 KB</small></div></div>
+      <div class="menu" aria-live="polite">
+        <div><span class="ar">ملف جديد في هذا المجلد</span><span class="en">New in this folder</span></div>
+        <div><span class="ar">مشاركة وبث</span><span class="en">Share &amp; broadcast</span></div>
+        <div><span class="ar">الطرفية</span><span class="en">Terminal</span></div>
+        <div><span class="ar">لصق الحافظة</span><span class="en">Paste clipboard</span></div>
+        <div><span class="ar">تحديد</span><span class="en">Select</span></div>
+      </div>
+      <button class="fab" id="fab" aria-label="Menu" aria-expanded="false"></button>
+      <div class="nav"><span class="on">Project</span><span>History</span><span style="width:60px"></span><span>Assistant</span><span>Settings</span></div>
+    </div>
+    <p class="hint"><span class="ar">جرّب: اضغط الزر الدائري</span><span class="en">Try it: tap the round button</span></p>
+  </div>
+</div>
+
+<section id="bar">
+  <h2><span class="ar">الأزرار: كل شيء في مكانه</span><span class="en">The buttons: everything in its place</span></h2>
+  <p class="lead"><span class="ar">الشريط السفلي هو قلب التطبيق. أربع صفحات وزر مركزي يتغيّر شكله وعمله بحسب الصفحة التي أنت فيها.</span><span class="en">The bottom bar is the heart of the app: four pages and a central button that changes its role depending on where you are.</span></p>
+  <div class="bar">
+    <div><b style="color:var(--gold)">Project</b><small><span class="ar">ملفاتك ومجلداتك مع بحث وتصنيف</span><span class="en">Your files and folders with search and filters</span></small></div>
+    <div><b style="color:var(--cyan)">History</b><small><span class="ar">سجل ما فتحته وعدّلته</span><span class="en">What you opened and edited</span></small></div>
+    <div><span class="ar">الزر المركزي<small><span class="ar">قائمة سريعة، أو إرسال رسالة في المساعد</span></small></span><span class="en">Central button<small>Quick menu, or send in Assistant</small></span></div>
+    <div><b style="color:var(--orange)">Assistant</b><small><span class="ar">مساعد ذكي يقرأ مشروعك وينفّذ</span><span class="en">An AI that reads your project and acts</span></small></div>
+    <div><b style="color:var(--mute)">Settings</b><small><span class="ar">النماذج والأوضاع والمظهر</span><span class="en">Models, modes and appearance</span></small></div>
+  </div>
+</section>
+
+<section id="features">
+  <h2><span class="ar">ما الذي يفعله Octa</span><span class="en">What Octa does</span></h2>
+  <p class="lead"><span class="ar">ستة أدوات في تطبيق واحد، وكل أداة تفتح من نفس المشروع.</span><span class="en">Six tools in one app, all opening from the same project.</span></p>
+  <div class="rows">
+    <div class="row" style="--c:var(--gold)"><h3><span class="ar">مدير الملفات</span><span class="en">File manager</span></h3><p><span class="ar">تصفّح المجلدات، وصفّ حسب التطبيقات والصور والفيديو والصوت والمستندات. ابحث بالاسم أو داخل المحتوى، وأنشئ ملفًا أو مجلدًا أو صورة جديدة.</span><span class="en">Browse folders and filter by apps, images, video, audio and documents. Search by name or content, and create new files, folders or images.</span></p></div>
+    <div class="row" style="--c:var(--teal)"><h3><span class="ar">محرر الأكواد</span><span class="en">Code editor</span></h3><p><span class="ar">تلوين للصياغة وترقيم للأسطر وتبويبات لـ HTML وJS وPython. زر تشغيل يعرض صفحتك فورًا، وعند فتح الملف تظهر لك أدوات الحجم والتنسيق والتراجع.</span><span class="en">Syntax colors, line numbers and tabs for HTML, JS and Python. A run button previews your page instantly, with tools for font size, formatting and undo.</span></p></div>
+    <div class="row" style="--c:var(--orange)"><h3><span class="ar">المساعد الذكي</span><span class="en">AI assistant</span></h3><p><span class="ar">يفهم هيكل مجلدك ويقترح عليك ما يمكن فعله، مثل تنظيم الكاميرا أو ضغط الصور. وضع الطيار الآلي ينفّذ القراءة والكتابة والنقل بلا سؤال، ووضع الخطة يعمل ضمن حدود ما تطلبه. وتستطيع إضافة نماذجك الخاصة.</span><span class="en">It understands your folder structure and suggests actions like organizing your camera folder or compressing images. Autopilot reads, writes and moves without asking; Plan mode stays within what you request. You can add your own models.</span></p></div>
+    <div class="row" style="--c:#ef7bb0"><h3><span class="ar">لوحة الرسم</span><span class="en">Drawing canvas</span></h3><p><span class="ar">لوحة بطبقات وفرشاة وقلم وعجلة لونية. اختر مقاس A4 أو مربعًا أو 16:9، بخلفية بيضاء أو شفافة، واحفظ بصيغة PNG أو BMP.</span><span class="en">A layered canvas with brush, pen and a color dial. Pick A4, square or 16:9, white or transparent background, and save as PNG or BMP.</span></p></div>
+    <div class="row" style="--c:var(--cyan)"><h3><span class="ar">المشاركة عبر Wi-Fi</span><span class="en">Wi-Fi sharing</span></h3><p><span class="ar">رمز QR ورابط محلي، وأي جهاز على نفس الشبكة يفتح ملفاتك. كلمة المرور اختيارية، لكن ننصح بها.</span><span class="en">A QR code and a local link: any device on the same network can open your files. The password is optional, but we recommend one.</span></p></div>
+    <div class="row" style="--c:var(--bronze)"><h3><span class="ar">بث صفحة ويب</span><span class="en">Broadcast a web page</span></h3><p><span class="ar">اختر الصفحات التي تريدها فقط، وسيرى الآخرون ما تصل إليه هذه الصفحات لا أكثر. الطرفية مدمجة أيضًا لمن يحتاجها.</span><span class="en">Choose only the pages you want; viewers see what those pages reach and nothing more. A built-in terminal is there when you need it.</span></p></div>
+  </div>
+</section>
+
+<section id="share">
+  <div class="share">
+    <div class="qr" id="qr" aria-hidden="true"></div>
+    <div>
+      <h2><span class="ar">أرسل ملفاتك في ثلاث خطوات</span><span class="en">Send files in three steps</span></h2>
+      <div class="link mono">http://share.local:4747/your-session</div>
+      <ol class="steps">
+        <li><span class="ar">اضغط الزر المركزي ثم «مشاركة وبث».</span><span class="en">Tap the central button, then “Share &amp; broadcast”.</span></li>
+        <li><span class="ar">امسح الرمز من الجهاز الآخر أو افتح الرابط.</span><span class="en">Scan the code on the other device, or open the link.</span></li>
+        <li><span class="ar">أنهِ الجلسة حين تنتهي، فيُغلق الرابط فورًا.</span><span class="en">End the session when you’re done and the link closes at once.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div>© <span id="y"></span> Octa</div>
+  <nav>
+    <a href="privacy.html"><span class="ar">سياسة الخصوصية</span><span class="en">Privacy policy</span></a>
+    <a href="mailto:bouzianyoom@gmail.com"><span class="ar">تواصل معنا</span><span class="en">Contact</span></a>
+  </nav>
+</footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,saved=null;
+  try{saved=localStorage.getItem("octa-lang")}catch(e){}
+  var lang=(saved==="ar"||saved==="en")?saved:"en";
+  function set(l){
+    lang=l;root.lang=l;root.dir=l==="ar"?"rtl":"ltr";
+    try{localStorage.setItem("octa-lang",l)}catch(e){}
+  }
+  set(lang);
+  document.querySelectorAll(".lang button").forEach(function(b){
+    b.addEventListener("click",function(){set(b.dataset.l)});
+  });
+  var phone=document.getElementById("phone"),fab=document.getElementById("fab");
+  fab.addEventListener("click",function(){
+    var o=phone.classList.toggle("open");fab.setAttribute("aria-expanded",o);
+  });
+  var q=document.getElementById("qr"),h="";
+  for(var i=0;i<121;i++){
+    var r=Math.floor(i/11),c=i%11,fin=(r<3&&c<3)||(r<3&&c>7)||(r>7&&c<3);
+    var on=fin?!(r%2===1&&c%2===1&&false)&&!((r===1||r===9)&&(c===1||c===9)):((i*7+r*3)%5<2);
+    h+='<i class="'+(on?"":"w")+'"></i>';
+  }
+  q.innerHTML=h;
+  document.getElementById("y").textContent=new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
